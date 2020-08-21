@@ -1,3 +1,8 @@
+"""
+通过保存的cookie，登陆企业微信界面，然后导入事先保存在mydata.xlsx的文件【里面有两条数据】，增加断言确定导入成功
+"""
+
+
 import shelve
 from time import sleep
 
@@ -21,16 +26,22 @@ class TestCookieCase():
 
     def test_shelves_savecontact_case(self):
         #shelve python内置的模块，相当于小型的数据库
+        #获取保存在cookies数据库中cookies值
         db = shelve.open('./mydbs/cookies')
         cookies = db['cookie']
+
+        #打开微信界面，为了后续输入cookie
         self.driver.get("https://work.weixin.qq.com/wework_admin/frame#index")
         for cookie in cookies:
             if 'expiry' in cookie:
                 cookie.pop("expiry")
             self.driver.add_cookie(cookie)
-
+        #再加入cookie之后，再次打开
         self.driver.get("https://work.weixin.qq.com/wework_admin/frame#index")
+        #点击导入通讯录界面
         self.driver.find_element(By.CSS_SELECTOR, ".index_service_cnt_itemWrap:nth-child(2)").click()
+
+        #选择上传文件
         self.driver.find_element(By.CSS_SELECTOR, "#js_upload_file_input").send_keys(
             "E:\share\project\python_selenium\\test_selenium_case\mydata.xlsx")
 
